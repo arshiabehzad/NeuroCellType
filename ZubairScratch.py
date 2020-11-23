@@ -25,7 +25,7 @@ df.head()
 
 
 
-new_df = df.filter(['specimen__id','specimen__hemisphere','structure__name','ef__avg_firing_rate','tag__dendrite_type','structure_name', 'donor_species'], axis=1)
+new_df = df['specimen__id','specimen__hemisphere','structure__name','ef__avg_firing_rate','tag__dendrite_type','structure_name', 'donor_species']
 
 
 # In[13]:
