@@ -1,5 +1,9 @@
 import pandas as pd
+import seaborn as sns
+import numpy as np
 
+def average(new_df, group_by_column, columns_to_average):
+    print(new_df.groupby(group_by_column)[columns_to_average].mean())
 
 def main():
     #reads csv file
@@ -17,11 +21,9 @@ def main():
     #creates new column with human as 1 and mouse as 0
     new_df['donor_species_human'] = new_df.donor__species.map( {'Homo Sapiens': 1, 'Mus musculus': 0})
     pd.set_option('display.max_columns', None)
-    averages(new_df)
+    #average(new_df, 'tag__dendrite_type_spiny', [ 'ef__avg_firing_rate' ])
+    average(new_df, 'structure_parent__acronym', ['ef__avg_firing_rate'])
 
-def averages(new_df):
-    
-    print(new_df.groupby('tag__dendrite_type')['ef__avg_firing_rate'].mean())
 
 
 if __name__ == '__main__':
