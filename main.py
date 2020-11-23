@@ -17,8 +17,12 @@ def main():
     #creates new column with human as 1 and mouse as 0
     new_df['donor_species_human'] = new_df.donor__species.map( {'Homo Sapiens': 1, 'Mus musculus': 0})
     pd.set_option('display.max_columns', None)
-    print(new_df.head())
-    new_df.info()
+    averages(new_df)
+
+def averages(new_df):
+    
+    print(new_df.groupby('tag__dendrite_type')['ef__avg_firing_rate'].mean())
+
 
 if __name__ == '__main__':
     main()
