@@ -36,6 +36,53 @@ def heatmapgen(new_df):
     g = sns.heatmap(heatmap_data, yticklabels=1, cmap='coolwarm')
     plt.show()
 
+df = pd.read_csv("cell_types_specimen_details.csv")
+new_df = df.filter(['specimen__hemisphere', 'structure_parent__acronym','tag__dendrite_type', 'donor__species','structure__layer','line_name'])
+#drops rows with sparsly spiny as dendrite type
+new_df.drop(new_df.index[new_df['tag__dendrite_type'] == 'sparsely spiny'], inplace=True)
+new_df = new_df.reset_index(drop=True)
+new_df=new_df.fillna(0)
+new_df.loc[new_df.line_name == 0, "line_name"] = "Unknown"
+new_df.head()  
+    
+def DecisionTreeClassifier():
+    features = ['specimen__hemisphere','structure_parent__acronym','donor__species','structure__layer','line_name']
+    inputs = new_df[features]
+    outputs = new_df['tag__dendrite_type']
+    le_hemisphere = LabelEncoder()
+    le_parent_acronym = LabelEncoder()
+    le_donor = LabelEncoder()
+    le_tag_dendrite = LabelEncoder()
+    le_line_name = LabelEncoder()
+    le_tag_layer = LabelEncoder()
+    inputs['hemi_n'] = le_hemisphere.fit_transform(new_df['specimen__hemisphere'])
+    inputs['donor_n'] = le_hemisphere.fit_transform(new_df['donor__species'])
+    inputs['parent_acro_n'] = le_hemisphere.fit_transform(new_df['structure_parent__acronym'])
+    inputs['tag_dendrite_n'] = le_hemisphere.fit_transform(new_df['tag__dendrite_type'])
+    inputs['line_name_n'] = le_hemisphere.fit_transform(new_df['line_name'])
+    inputs['structure_layer_n'] = le_hemisphere.fit_transform(new_df['structure__layer'])
+    inputs_n = inputs_n.reset_index(drop=True)
+    X = inputs_n.drop(['tag_dendrite_n'], axis = 1)
+    y = inputs_n['tag_dendrite_n']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=1)
+    model = tree.DecisionTreeClassifier(criterion = 'entropy')
+    model.fit(X_train, y_train)
+    
+def confusion_mat():
+    pred = model.predict(X_train)
+    array = (confusion_matrix(y_train, pred))
+    statement = "The confusion matrix for this model is shown here:"
+    return array, statement
+    
+def accuracy_model():
+        pred = model.predict(X_train)
+        accuracy = "The model's accuracy is", + model.score(X_train,y_train)
+        return accuracy
+    
+accuracy_model()
+confusion_mat()
+    
+    
 def main():
     #reads csv file
     df = pd.read_csv("cell_types_specimen_details.csv")
