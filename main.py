@@ -38,6 +38,7 @@ def heatmapgen(new_df):
     g = sns.heatmap(heatmap_data, yticklabels=1, cmap='coolwarm')
     plt.show()
 
+"""
 df = pd.read_csv("cell_types_specimen_details.csv")
 new_df = df.filter(['specimen__hemisphere', 'structure_parent__acronym','tag__dendrite_type', 'donor__species','structure__layer','line_name'])
 #drops rows with sparsly spiny as dendrite type
@@ -83,7 +84,7 @@ def accuracy_model():
     
 accuracy_model()
 confusion_mat()
-    
+"""
     
 def main():
     #reads csv file
