@@ -36,6 +36,8 @@ def heatmapgen(new_df, binary):
     column_order = ['0-10','10-20','20-30','30-40','40-50','50-60','60-70','70-80','80-90','90-100','100-110','110-120','120-130','130-140','140-150','150-160']
     heatmap_data = heatmap_data.reindex(column_order, axis=1)
     g = sns.heatmap(heatmap_data, yticklabels=1, cmap='coolwarm')
+    g.set_ylabel('Brain Structure Acronym')
+    g.set_xlabel('How many neurons had this firing rate')
     plt.show()
 
 """
@@ -102,8 +104,10 @@ def main():
     #creates new column with human as 1 and mouse as 0
     new_df['donor_species_human'] = new_df.donor__species.map( {'Homo Sapiens': 1, 'Mus musculus': 0})
     pd.set_option('display.max_columns', None)
-    #get average spiny and aspiny firing rates
-    print(average(new_df, 'tag__dendrite_type_spiny', [ 'ef__avg_firing_rate' ]))
+    #get average spiny and aspiny firing rates (and make it look nice)
+    new_df['Dendrite Type'] = new_df['tag__dendrite_type']
+    new_df['Average Firing Rate'] = new_df['ef__avg_firing_rate']
+    print(average(new_df, 'Dendrite Type', ['Average Firing Rate']))
     #generate spiny heatmap
     heatmapgen(new_df, 1)
     #generate aspiny heatmap
