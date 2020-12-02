@@ -9,10 +9,10 @@ def average(new_df, group_by_column, columns_to_average):
     avg = new_df.groupby(group_by_column)[columns_to_average].mean()
     return avg
 
-def heatmapgen(new_df):
+def heatmapgen(new_df, binary):
 
     #initialize new dataframe
-    average_df = pd.DataFrame(new_df,columns=['structure_parent__acronym','ef__avg_firing_rate'])
+    average_df = new_df.loc[new_df['tag__dendrite_type_spiny'] == binary].copy()
 
     #sort data into buckets
     average_df.loc[average_df['ef__avg_firing_rate'] > 10, 'bucket'] = '10-20'
@@ -102,8 +102,12 @@ def main():
     #creates new column with human as 1 and mouse as 0
     new_df['donor_species_human'] = new_df.donor__species.map( {'Homo Sapiens': 1, 'Mus musculus': 0})
     pd.set_option('display.max_columns', None)
-    #print(average(new_df, 'tag__dendrite_type_spiny', [ 'ef__avg_firing_rate' ]))
-    heatmapgen(new_df)
+    #get average spiny and aspiny firing rates
+    print(average(new_df, 'tag__dendrite_type_spiny', [ 'ef__avg_firing_rate' ]))
+    #generate spiny heatmap
+    heatmapgen(new_df, 1)
+    #generate aspiny heatmap
+    heatmapgen(new_df, 0)
 
 
 if __name__ == '__main__':
