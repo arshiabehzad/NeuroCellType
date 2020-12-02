@@ -2,6 +2,8 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import precision_recall_fscore_support
+from sklearn.metrics import confusion_matrix, classification_report
 
 def average(new_df, group_by_column, columns_to_average):
     avg = new_df.groupby(group_by_column)[columns_to_average].mean()
