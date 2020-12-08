@@ -2,8 +2,14 @@ import pandas as pd
 import seaborn as sns
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import accuracy_score, roc_curve, auc
+import statsmodels
+
 
 def average(new_df, group_by_column, columns_to_average):
     avg = new_df.groupby(group_by_column)[columns_to_average].mean()
@@ -87,6 +93,44 @@ def accuracy_model():
 accuracy_model()
 confusion_mat()
 """
+
+def loadData(df):
+    names = ["ef__avg_firing_rate"]
+    x = df[names]
+    y = df["tag__dendrite_type_spiny"]
+    xtrain, xtest, ytrain, ytest = train_test_split(x, y, test_size=0.2)
+    return xtrain, xtest, ytrain, ytest
+
+
+def getAUC(logReg, xTest, yTest, label=0):
+    yScores = logReg.predict_proba(xTest)
+    fpr, tpr, threshold = roc_curve(yTest, yScores[:, label], pos_label=label)
+    rocAUC = auc(fpr, tpr)
+    return fpr, tpr, threshold, rocAUC
+
+
+def plotAUC(model, xTest, yTest, labelSet):
+    fig, axs = plt.subplots(labelSet.shape[0])
+    for i in range(len(labelSet)):
+        fpr, tpr, threshold, rocAUC = getAUC(model, xTest, yTest, labelSet[i])
+        sns.lineplot(ax=axs[i], x=fpr, y=tpr, estimator=None)
+        axs[i].legend(labels=[('AUC = %0.2f' % rocAUC)])
+    plt.show()
+
+
+def runLogReg(df):
+    xTrain, xTest, yTrain, yTest = loadData(df)
+    no_reg = LogisticRegression(solver="saga", max_iter=10000)
+    print("Cross-Validation Score:")
+    no_reg.fit(xTrain, yTrain)
+    score = cross_val_score(no_reg, xTrain, yTrain)
+    print(score.mean())
+    plotAUC(no_reg, xTest, yTest, np.unique(yTrain))
+    g = sns.regplot(x='ef__avg_firing_rate', y='tag__dendrite_type_spiny', data=df, logistic=True)
+    g.set_ylabel('Dendrite Type (0 = Aspiny, 1 = Spiny)')
+    g.set_xlabel('Average Firing Rate')
+    plt.show()
+
     
 def main():
     #reads csv file
@@ -112,6 +156,7 @@ def main():
     heatmapgen(new_df, 1)
     #generate aspiny heatmap
     heatmapgen(new_df, 0)
+    runLogReg(new_df)
 
 
 if __name__ == '__main__':
